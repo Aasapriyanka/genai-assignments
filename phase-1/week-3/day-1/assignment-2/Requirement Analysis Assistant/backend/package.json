@@ -1,0 +1,18 @@
+{
+  "name": "requirement-analysis-assistant-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Read-only Jira connector for Requirement Analysis Assistant",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

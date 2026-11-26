@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RAA — Requirement Analysis Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="RAA overview">
+        <img class="brand-logo" src="assets/raa-logo.svg" alt="" width="40" height="40">
+        <span class="brand-copy"><strong id="app-name">RAA</strong><small id="app-full-name">Requirement Analysis Assistant</small></span>
+      </a>
+      <p class="brand-tagline">From requirements to test readiness.</p>
+      <div class="topbar-actions">
+        <span class="project-context"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-overview"></use></svg><span id="project-display" class="project-display" hidden>No project selected</span></span>
+        <span id="connection-status" class="status-badge" role="status"><span class="status-dot" aria-hidden="true"></span><span id="connection-status-label">Not connected</span></span>
+        <span class="read-only-badge"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-check"></use></svg>Read-only Jira</span>
+      </div>
+    </header>
+
+    <main class="page">
+      <section id="connection-panel" class="panel connection-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">JIRA CLOUD</p>
+            <h1>Connect your workspace</h1>
+            <p class="muted">Connect securely to browse projects and read user stories.</p>
+          </div>
+          <span class="lock-mark" aria-hidden="true">↗</span>
+        </div>
+        <form id="connection-form">
+          <div class="form-grid">
+            <label class="field field-wide">
+              <span>Jira site URL</span>
+              <input id="instance-url" name="instanceUrl" type="url" placeholder="https://your-site.atlassian.net" autocomplete="url" required>
+              <small>Use your Jira Cloud site URL.</small>
+            </label>
+            <label class="field">
+              <span>Email address</span>
+              <input id="email" name="email" type="email" placeholder="you@company.com" autocomplete="username" required>
+            </label>
+            <label class="field">
+              <span>API token</span>
+              <input id="api-token" name="apiToken" type="password" placeholder="Enter your Jira API token" autocomplete="off" required>
+            </label>
+          </div>
+          <div class="form-footer">
+            <p class="security-note"><span aria-hidden="true">●</span> Credentials are kept in browser session memory and cleared when you disconnect or close your browser session.</p>
+            <button id="connect-button" class="button button-primary" type="submit">Connect to Jira</button>
+          </div>
+          <p id="connection-error" class="error-message" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <section id="workspace-panel" class="workspace-panel" hidden>
+        <div class="project-controls global-project-controls">
+          <label class="field project-field">
+            <span>Jira project</span>
+            <select id="project-select" required>
+              <option value="">Select a Jira project</option>
+            </select>
+          </label>
+          <button id="retrieve-button" class="button button-primary" type="button" disabled>Retrieve stories</button>
+          <span id="project-readonly" class="muted small-copy">Read-only Jira integration · navigation does not make requests</span>
+          <button id="disconnect-button" class="button button-quiet" type="button">Disconnect</button>
+        </div>
+        <p id="workspace-error" class="error-message" role="alert" hidden></p>
+
+        <div class="app-layout">
+          <aside class="sidebar" aria-label="Workspace navigation">
+            <div class="sidebar-heading">
+              <a class="sidebar-brand" href="#" aria-label="RAA overview">
+                <img src="assets/raa-logo.svg" alt="" width="42" height="42">
+                <span class="sidebar-brand-copy"><strong>RAA</strong><small>Quality workspace</small></span>
+              </a>
+              <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Collapse navigation" aria-controls="workspace-navigation" aria-expanded="true" title="Collapse navigation">
+                <svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-menu"></use></svg>
+              </button>
+            </div>
+            <nav id="workspace-navigation" class="primary-nav" aria-label="Workspace modules">
+              <button class="nav-item module-overview active" type="button" data-view="overview" aria-label="Overview" aria-current="page" title="Overview"><svg class="nav-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-overview"></use></svg><span class="nav-label">Overview</span></button>
+              <button class="nav-item module-requirements" type="button" data-view="requirements" aria-label="Requirements" title="Requirements"><svg class="nav-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-requirements"></use></svg><span class="nav-label">Requirements</span></button>
+              <button class="nav-item module-dependencies" type="button" data-view="dependencies" aria-label="Dependencies" title="Dependencies"><svg class="nav-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-dependencies"></use></svg><span class="nav-label">Dependencies</span></button>
+              <button class="nav-item module-prioritisation" type="button" data-view="prioritisation" aria-label="Prioritisation" title="Prioritisation"><svg class="nav-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-prioritisation"></use></svg><span class="nav-label">Prioritisation</span></button>
+              <button class="nav-item module-work-plan" type="button" data-view="work-plan" aria-label="Work Plan" title="Work Plan"><svg class="nav-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-work-plan"></use></svg><span class="nav-label">Work Plan</span></button>
+              <button class="nav-item module-questions" type="button" data-view="questions" aria-label="PO Questions" title="PO Questions"><svg class="nav-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-questions"></use></svg><span class="nav-label">PO Questions</span></button>
+              <button class="nav-item module-reports" type="button" data-view="reports" aria-label="Reports" title="Reports"><svg class="nav-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-reports"></use></svg><span class="nav-label">Reports</span></button>
+              <button class="nav-item module-settings" type="button" data-view="settings" aria-label="Settings" title="Settings"><svg class="nav-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-settings"></use></svg><span class="nav-label">Settings</span></button>
+            </nav>
+            <p class="sidebar-note"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-check"></use></svg>Recommendations require human review. Jira is read-only.</p>
+          </aside>
+
+          <div class="workspace-views">
+            <section id="view-overview" class="app-view" aria-labelledby="overview-title">
+              <div class="view-heading">
+                <div><p class="eyebrow">PROJECT OVERVIEW</p><h1 id="overview-title">Quality engineering workspace</h1>
+                  <p class="muted">Retrieved stories, completed assessments and planning results are shown separately. No recommendation is inferred from missing data.</p></div>
+                <span id="overview-project-key" class="project-key-pill">No project</span>
+              </div>
+              <section class="overview-section project-summary-section">
+                <div class="section-title"><svg class="module-heading-icon accent-indigo" aria-hidden="true"><use href="assets/module-icons.svg#icon-overview"></use></svg><div><h2>Project summary</h2><p class="muted">Coverage is based on the currently retrieved Jira stories.</p></div></div>
+                <div id="overview-metrics" class="overview-kpi-grid"></div>
+              </section>
+              <div class="overview-grid">
+                <article class="overview-card overview-panel">
+                  <div class="section-title"><svg class="module-heading-icon accent-indigo" aria-hidden="true"><use href="assets/module-icons.svg#icon-chart"></use></svg><h2>Analysis coverage</h2></div>
+                  <p id="coverage-copy" class="muted">Retrieve requirements to see analysis coverage.</p>
+                  <div id="coverage-chart" class="donut-chart"></div>
+                </article>
+                <article class="overview-card overview-panel">
+                  <div class="section-title"><svg class="module-heading-icon accent-blue" aria-hidden="true"><use href="assets/module-icons.svg#icon-target"></use></svg><h2>Requirement clarity</h2></div>
+                  <p id="clarity-subtitle" class="chart-subtitle"></p>
+                  <div id="clarity-chart" class="bar-chart" role="group" aria-label="Clarity of analysed requirements"></div>
+                </article>
+                <article class="overview-card overview-panel">
+                  <div class="section-title"><svg class="module-heading-icon accent-purple" aria-hidden="true"><use href="assets/module-icons.svg#icon-check"></use></svg><h2>Acceptance-criteria quality</h2></div>
+                  <p id="criteria-subtitle" class="chart-subtitle"></p>
+                  <p class="chart-hint">Only analysed requirements are included; unavailable fields remain distinct from missing criteria.</p>
+                  <div id="criteria-chart" class="bar-chart" role="group" aria-label="Acceptance-criteria quality for analysed requirements"></div>
+                </article>
+                <article class="overview-card overview-panel">
+                  <div class="section-title"><svg class="module-heading-icon accent-teal" aria-hidden="true"><use href="assets/module-icons.svg#icon-check"></use></svg><h2>Test-design readiness</h2></div>
+                  <p id="readiness-subtitle" class="chart-subtitle"></p>
+                  <div id="readiness-chart" class="bar-chart" role="group" aria-label="Test-design readiness for analysed requirements"></div>
+                </article>
+                <article class="overview-card overview-panel">
+                  <div class="section-title"><svg class="module-heading-icon accent-purple" aria-hidden="true"><use href="assets/module-icons.svg#icon-dependencies"></use></svg><h2>Dependency intelligence</h2></div>
+                  <div id="dependency-metrics" class="overview-insights"></div>
+                </article>
+                <article class="overview-card overview-panel">
+                  <div class="section-title"><svg class="module-heading-icon accent-amber" aria-hidden="true"><use href="assets/module-icons.svg#icon-prioritisation"></use></svg><h2>Prioritisation summary</h2></div>
+                  <div id="prioritisation-summary" class="overview-insights"></div>
+                </article>
+                <article class="overview-card overview-panel">
+                  <div class="section-title"><svg class="module-heading-icon accent-pink" aria-hidden="true"><use href="assets/module-icons.svg#icon-questions"></use></svg><h2>Product Owner clarifications</h2></div>
+                  <div id="question-summary" class="overview-insights"></div>
+                </article>
+                <article class="overview-card next-actions-card">
+                  <div class="section-title"><svg class="module-heading-icon accent-indigo" aria-hidden="true"><use href="assets/module-icons.svg#icon-arrow-right"></use></svg><h2>Recommended next actions</h2></div>
+                  <div id="recommended-actions" class="action-list"></div>
+                </article>
+              </div>
+              <p class="scope-note">No documented dependency is not proof of independence. Unanalysed requirements are excluded from clarity and readiness totals.</p>
+            </section>
+
+            <section id="view-requirements" class="app-view" aria-labelledby="requirements-title" hidden>
+              <div class="view-heading">
+                <div><p class="eyebrow">REQUIREMENT WORKSPACE</p><h1 id="requirements-title">Requirements</h1>
+                  <p class="muted">Search, select, analyze, and review the original Jira content.</p></div>
+                <span class="read-only-badge">Read-only</span>
+              </div>
+              <div id="dashboard" class="dashboard" hidden>
+                <div class="dashboard-toolbar">
+                  <div><h2>Retrieved stories <span id="story-count" class="count-pill">0</span></h2>
+                    <p id="selection-count" class="muted small-copy">No stories selected</p>
+                    <button id="clear-selection" class="button button-quiet" type="button">Clear selection</button></div>
+                  <label class="search-field"><span class="visually-hidden">Search stories</span><span class="search-icon" aria-hidden="true">⌕</span>
+                    <input id="story-search" type="search" placeholder="Search ID, title or status"></label>
+                </div>
+                <div class="filter-row requirement-filters">
+                  <label class="field"><span>Jira status</span><select id="story-status-filter"><option value="">All statuses</option></select></label>
+                  <label class="field"><span>Analysis status</span><select id="story-analysis-filter"><option value="">All analysis states</option><option value="analysed">Analysed</option><option value="failed">Failed</option><option value="not-analysed">Not analysed</option></select></label>
+                </div>
+                <div class="table-wrap">
+                  <table class="requirements-table">
+                    <thead><tr>
+                      <th class="select-column"><input id="select-all" type="checkbox" aria-label="Select all visible stories"></th>
+                      <th>Jira ID</th><th>Requirement title</th><th>Jira status</th><th>Jira priority</th><th>Analysis status</th><th>Details</th>
+                    </tr></thead>
+                    <tbody id="story-list"></tbody>
+                  </table>
+                  <div id="empty-state" class="empty-state" hidden><span class="empty-icon" aria-hidden="true">◇</span>
+                    <h3>No stories to show</h3><p id="empty-message">Select a project and retrieve its user stories.</p></div>
+                </div>
+                <section id="story-source-detail" class="analysis-detail" hidden>
+                  <div class="detail-heading"><div><p class="eyebrow">JIRA SOURCE</p><h2 id="story-source-title"></h2></div>
+                    <button id="close-story-source" class="button button-quiet" type="button">Close</button></div>
+                  <article class="detail-card"><h3>Original description</h3><pre id="story-source-description"></pre>
+                    <h3>Original acceptance criteria</h3><p id="story-source-criteria"></p></article>
+                </section>
+                <div class="analysis-action-bar">
+                  <label class="consent-check"><input id="groq-consent" type="checkbox">
+                    <span>I understand that selected requirement content will be sent to GroqCloud for analysis. Structurally empty requirements are assessed locally.</span></label>
+                  <button id="analyze-button" class="button button-primary" type="button" disabled>Analyse requirements</button>
+                </div>
+                <p id="analysis-error" class="error-message" role="alert" hidden></p>
+                <section id="analysis-progress" class="analysis-progress" aria-live="polite" hidden>
+                  <div class="progress-label"><strong>Analysis progress</strong><span id="progress-count">0 of 0 analysed</span></div>
+                  <progress id="progress-bar" max="1" value="0"></progress>
+                  <p id="progress-message" class="muted small-copy"></p>
+                  <div id="progress-details" class="progress-details" aria-label="Requirement analysis status"></div>
+                </section>
+                <section id="analysis-results" class="analysis-results" hidden>
+                  <div class="results-heading">
+                    <div><p class="eyebrow">EVIDENCE-BASED RECOMMENDATIONS · HUMAN REVIEW REQUIRED</p><h2>Analysis results</h2></div>
+                    <div class="results-actions"><span id="active-groq-model" class="model-badge" role="status">Groq model: not selected</span>
+                      <button id="copy-all-questions" class="button button-quiet" type="button">Copy all questions</button></div>
+                  </div>
+                  <div id="analysis-summary" class="summary-grid"></div>
+                  <div id="analysis-failures" class="analysis-failures" hidden></div>
+                  <div class="filter-row">
+                    <label class="field"><span>Clarity</span><select id="clarity-filter"><option value="">All clarity</option><option value="CLEAR">Clear</option><option value="PARTIALLY_CLEAR">Partially clear</option><option value="AMBIGUOUS">Ambiguous</option></select></label>
+                    <label class="field"><span>Acceptance criteria</span><select id="criteria-filter"><option value="">All statuses</option></select></label>
+                    <label class="field"><span>Test design readiness</span><select id="readiness-filter"><option value="">All readiness</option><option value="READY_FOR_TEST_DESIGN">Ready for test design</option><option value="PARTIALLY_READY">Partially ready</option><option value="NOT_READY">Not ready</option></select></label>
+                  </div>
+                  <div class="table-wrap results-table-wrap">
+                    <table><thead><tr><th>Jira ID</th><th>Requirement</th><th>Jira priority</th><th>Analysis source</th><th>Clarity</th><th>Acceptance criteria</th><th>Test design</th><th>Gaps</th><th>Questions</th><th>Action</th></tr></thead>
+                      <tbody id="analysis-list"></tbody></table>
+                    <div id="analysis-empty" class="empty-state" hidden><h3>No matching analysis results</h3><p>Change the filters to see other results.</p></div>
+                  </div>
+                  <section id="analysis-detail" class="analysis-detail" aria-live="polite" hidden>
+                    <div class="detail-heading"><div><p class="eyebrow">REQUIREMENT ANALYSIS</p><h2 id="detail-title"></h2></div><button id="close-detail" class="button button-quiet" type="button">Close</button></div>
+                    <p id="detail-source" class="human-review-note">Review recommendations against the source requirement before taking action.</p>
+                    <details class="detail-section" open><summary>Original Jira requirement</summary><article class="detail-card"><h3 id="detail-original-title"></h3><pre id="detail-original-description"></pre><p id="detail-original-criteria"></p></article></details>
+                    <details class="detail-section" open><summary>Clarity assessment</summary><article class="detail-card"><p id="detail-clarity"></p><p id="detail-clarity-reasoning"></p><div id="detail-dimensions"></div></article></details>
+                    <details class="detail-section"><summary>Acceptance-criteria findings</summary><article class="detail-card"><p id="detail-ac-status"></p><p id="detail-ac-consistency"></p><div id="detail-ac-findings"></div></article></details>
+                    <details class="detail-section"><summary>Identified gaps</summary><article class="detail-card"><div id="detail-gaps"></div></article></details>
+                    <details class="detail-section"><summary>Test-design readiness</summary><article class="detail-card"><p id="detail-readiness"></p><p id="detail-readiness-reasoning"></p><h4>Test execution readiness</h4><p id="detail-execution-readiness">Not assessed by this analysis.</p><p id="detail-next-action"></p></article></details>
+                    <details class="detail-section"><summary>Product Owner clarification questions</summary><article class="detail-card"><div class="detail-heading"><h3>Clarifications for this requirement</h3><button id="copy-requirement-questions" class="button button-quiet" type="button">Copy questions</button></div><div id="detail-questions"></div></article></details>
+                  </section>
+                </section>
+              </div>
+            </section>
+
+            <section id="view-dependencies" class="app-view" aria-labelledby="dependencies-title" hidden>
+              <div id="dependency-workspace-empty" class="empty-state" hidden><h3>No requirements in scope</h3><p>Select a project and retrieve requirements before building a dependency plan.</p></div>
+              <section id="planning-section" class="planning-section" aria-labelledby="dependencies-title">
+                <div class="view-heading">
+                  <div><p class="eyebrow">DEPENDENCY WORKSPACE</p><h1 id="dependencies-title">Dependencies</h1>
+                    <p class="muted">Rule-based mode uses documented Jira links. AI suggestions are optional and require review.</p></div>
+                  <span id="planning-model" class="model-badge" role="status">Groq model: not used</span>
+                </div>
+                <div class="planning-controls">
+                  <label class="field"><span>Planning scope</span><select id="planning-scope"><option value="selected">Selected requirements</option><option value="project">All retrieved requirements</option></select></label>
+                  <label class="field"><span>Planning approach</span><select id="planning-mode"><option value="rule-based">Rule-based · Jira links only</option><option value="ai-enhanced">AI-assisted · suggestions need review</option></select></label>
+                  <button id="planning-estimate-button" class="button button-quiet" type="button">Estimate AI analysis</button>
+                  <button id="planning-run-button" class="button button-primary" type="button">Build rule-based plan</button>
+                </div>
+                <div id="planning-estimate" class="planning-estimate" aria-live="polite" hidden></div>
+                <label id="planning-consent-row" class="consent-check planning-consent" hidden><input id="planning-consent" type="checkbox">
+                  <span>I consent to sending the requirements in this scope, Jira link labels, and available analysis findings to GroqCloud. Suggestions remain unconfirmed until I review them.</span></label>
+                <p id="planning-error" class="error-message" role="alert" hidden></p>
+                <section id="planning-progress" class="analysis-progress" aria-live="polite" hidden>
+                  <div class="progress-label"><strong>Semantic planning progress</strong><span id="planning-progress-count">0 of 0 groups complete</span></div>
+                  <progress id="planning-progress-bar" max="1" value="0"></progress>
+                  <p id="planning-progress-message" class="muted small-copy"></p>
+                  <div id="planning-progress-details" class="progress-details" aria-label="Semantic group status"></div>
+                </section>
+                <section id="planning-results" class="planning-results" hidden>
+                  <div class="planning-result-heading"><div><p class="eyebrow">HUMAN-REVIEWABLE PLANNING</p><h2>Dependency overview</h2></div>
+                    <span class="model-badge">Counts use the selected planning scope</span></div>
+                  <div id="planning-summary" class="summary-grid"></div>
+                  <div id="planning-warnings" class="planning-warnings" role="status"></div>
+                  <div class="graph-controls">
+                    <p class="chart-hint">Select a node for evidence and direct or transitive relationships. “No Jira links” is not proof of independence.</p>
+                    <div class="graph-control-actions" role="group" aria-label="Dependency graph view controls">
+                      <button id="graph-zoom-out" class="button button-quiet" type="button" aria-label="Zoom out" title="Zoom out"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-zoom-out"></use></svg></button>
+                      <button id="graph-zoom-in" class="button button-quiet" type="button" aria-label="Zoom in" title="Zoom in"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-zoom-in"></use></svg></button>
+                      <button id="graph-fit" class="button button-quiet" type="button" title="Fit graph to view"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-fit"></use></svg>Fit view</button>
+                      <button id="graph-reset" class="button button-quiet" type="button" title="Reset graph zoom and node selection">Reset</button>
+                    </div>
+                  </div>
+                  <div class="graph-legend" aria-label="Dependency relationship legend">
+                    <span><i class="legend-line explicit"></i>Explicit Jira relationship</span>
+                    <span><i class="legend-line confirmed"></i>Human-confirmed suggestion</span>
+                    <span><i class="legend-line provisional"></i>Provisional AI suggestion</span>
+                    <span><i class="legend-node no-jira"></i>No Jira dependency documented</span>
+                    <span>Arrow direction: prerequisite → dependent</span>
+                  </div>
+                  <div class="graph-layout">
+                    <div class="dependency-graph-wrap"><svg id="dependency-graph" class="dependency-graph" role="img" aria-label="Requirement dependency graph"></svg></div>
+                    <aside id="graph-node-detail" class="graph-node-detail" aria-live="polite">
+                      <h4>Select a requirement to view its dependencies and supporting evidence.</h4>
+                    </aside>
+                  </div>
+                  <h2 class="subsection-title">Relationship review and evidence</h2>
+                  <div class="table-wrap planning-table-wrap">
+                    <table><thead><tr><th>Prerequisite</th><th>Dependent</th><th>Type and status</th><th>Evidence</th><th>Potential testing impact</th><th>Review</th></tr></thead>
+                      <tbody id="dependency-list"></tbody></table>
+                    <div id="dependency-empty" class="empty-state" hidden><h3>No dependency links identified</h3><p>No links were found in this scope. This is not proof of functional independence.</p></div>
+                  </div>
+                </section>
+              </section>
+            </section>
+
+            <section id="view-prioritisation" class="app-view" aria-labelledby="prioritisation-title" hidden>
+              <div class="view-heading"><div><p class="eyebrow">EVIDENCE-AWARE BACKLOG</p><h1 id="prioritisation-title">Prioritisation</h1>
+                <p class="muted">Recommended testing priority is separate from original Jira priority and work sequence.</p></div><button id="export-planning-csv" class="button button-quiet" type="button">Export backlog CSV</button></div>
+              <p class="assumption-note">Scoring weights are configurable product assumptions, not universal industry standards. Dependency evidence coverage describes documented relationship information, not certainty that all dependencies are known.</p>
+              <div id="planning-backlog-view" class="planning-view">
+                <div class="filter-row"><label class="field"><span>Priority ranking</span><select id="backlog-filter"><option value="">All items</option><option value="RANKED">Ranked only</option><option value="UNRANKED">Needs more evidence</option></select></label></div>
+                <div class="table-wrap planning-table-wrap priority-table-wrap">
+                  <table><thead><tr><th>Rank</th><th>Requirement</th><th>Original Jira priority</th><th>Recommended testing score</th><th>Evidence coverage</th><th>Readiness</th><th>Recommended action</th><th>Scoring details</th></tr></thead>
+                    <tbody id="priority-list"></tbody></table>
+                  <div id="backlog-empty" class="empty-state" hidden><h3>No backlog items match</h3><p>Build a plan or change the filter.</p></div>
+                </div>
+              </div>
+            </section>
+
+            <section id="view-work-plan" class="app-view" aria-labelledby="work-plan-title" hidden>
+              <div class="view-heading"><div><p class="eyebrow">RECOMMENDED SEQUENCE</p><h1 id="work-plan-title">Work Plan</h1>
+                <p class="muted">Test design readiness is distinct from test execution readiness. Unresolved blockers stay out of ready groups.</p></div></div>
+              <div id="work-sequence"></div>
+              <div id="sequence-empty" class="empty-state"><h3>No work plan is available</h3><p>Retrieve requirements and build a rule-based or AI-assisted plan.</p></div>
+            </section>
+
+            <section id="view-questions" class="app-view" aria-labelledby="questions-title" hidden>
+              <div class="view-heading"><div><p class="eyebrow">TRACEABLE CLARIFICATIONS</p><h1 id="questions-title">Product Owner questions</h1>
+                <p class="muted">Questions are not sent to Jira or the Product Owner.</p></div><button id="copy-filtered-questions" class="button button-quiet" type="button">Copy filtered questions</button></div>
+              <p id="question-count-note" class="scope-note">Questions will appear after analysis or planning.</p>
+              <div class="filter-row question-filters">
+                <label class="field"><span>Jira ID</span><select id="question-requirement-filter"><option value="">All requirements</option></select></label>
+                <label class="field"><span>Priority</span><select id="question-priority-filter"><option value="">All priorities</option><option value="HIGH">High</option><option value="MEDIUM">Medium</option><option value="LOW">Low</option></select></label>
+                <label class="field"><span>Gap category</span><select id="question-gap-filter"><option value="">All gap categories</option></select></label>
+                <label class="field"><span>Blocks test design</span><select id="question-blocking-filter"><option value="">All questions</option><option value="yes">Blocking</option><option value="no">Not marked as blocking</option></select></label>
+                <label class="field"><span>Question source</span><select id="question-source-filter"><option value="">All sources</option></select></label>
+              </div>
+              <div id="question-register" class="question-register"></div>
+              <div id="question-empty" class="empty-state" hidden><h3>No questions match</h3><p>Adjust filters or run requirement analysis.</p></div>
+            </section>
+
+            <section id="view-reports" class="app-view" aria-labelledby="reports-title" hidden>
+              <div class="view-heading"><div><p class="eyebrow">LOCAL EXPORTS</p><h1 id="reports-title">Reports</h1>
+                <p class="muted">Exports use current session data and do not trigger Jira or GroqCloud requests.</p></div></div>
+              <div id="report-status" class="muted" role="status"></div>
+              <label class="field report-scope-field"><span>Report requirement scope</span><select id="report-scope"><option value="all">All retrieved requirements</option><option value="selected">Selected requirements</option></select></label>
+              <section class="report-preview-card" aria-live="polite">
+                <div class="detail-heading"><div><h2 id="report-preview-title">Report preview</h2><p id="report-preview-summary" class="muted">Choose a report to preview current session data.</p></div></div>
+                <div id="report-preview-empty" class="empty-state"><h3>No preview selected</h3><p>Choose Preview on a report card to inspect its contents before downloading.</p></div>
+                <div id="report-preview-table-wrap" class="table-wrap" hidden>
+                  <table><thead id="report-preview-head"></thead><tbody id="report-preview-body"></tbody></table>
+                </div>
+              </section>
+              <div class="report-grid">
+                <article class="report-card report-requirements"><h2><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-requirements"></use></svg>Requirement analysis</h2><p>Requirement source fields, analysis status, findings, readiness and questions.</p><div class="report-actions"><button class="button button-quiet" type="button" data-preview="requirements"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-overview"></use></svg>Preview</button><button class="button button-quiet" type="button" data-report="requirements"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-download"></use></svg>Download CSV</button></div></article>
+                <article class="report-card report-dependencies"><h2><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-dependencies"></use></svg>Dependency analysis</h2><p>Documented and reviewed relationships, evidence and status.</p><div class="report-actions"><button class="button button-quiet" type="button" data-preview="dependencies"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-overview"></use></svg>Preview</button><button class="button button-quiet" type="button" data-report="dependencies"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-download"></use></svg>Download CSV</button></div></article>
+                <article class="report-card report-prioritisation"><h2><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-prioritisation"></use></svg>Prioritised backlog</h2><p>Recommended score, factor evidence and ranking coverage.</p><div class="report-actions"><button class="button button-quiet" type="button" data-preview="prioritisation"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-overview"></use></svg>Preview</button><button class="button button-quiet" type="button" data-report="prioritisation"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-download"></use></svg>Download CSV</button></div></article>
+                <article class="report-card report-work-plan"><h2><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-work-plan"></use></svg>Recommended work plan</h2><p>Suggested action, sequence, blockers and reasons.</p><div class="report-actions"><button class="button button-quiet" type="button" data-preview="work-plan"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-overview"></use></svg>Preview</button><button class="button button-quiet" type="button" data-report="work-plan"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-download"></use></svg>Download CSV</button></div></article>
+                <article class="report-card report-questions"><h2><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-questions"></use></svg>PO clarification questions</h2><p>Current question register with traceability.</p><div class="report-actions"><button class="button button-quiet" type="button" data-preview="questions"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-overview"></use></svg>Preview</button><button class="button button-quiet" type="button" data-report="questions"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-download"></use></svg>Download CSV</button></div></article>
+                <article class="report-card report-html"><h2><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-reports"></use></svg>Consolidated HTML report</h2><p>Download a self-contained, printable summary. Open locally and use the browser print dialog to save as PDF.</p><div class="report-actions"><button id="preview-html-report" class="button button-quiet" type="button"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-overview"></use></svg>Preview</button><button id="export-html-report" class="button button-primary" type="button"><svg class="ui-icon" aria-hidden="true"><use href="assets/module-icons.svg#icon-download"></use></svg>Download HTML</button></div></article>
+              </div>
+            </section>
+
+            <section id="view-settings" class="app-view" aria-labelledby="settings-title" hidden>
+              <div class="view-heading"><div><p class="eyebrow">SESSION AND PRIVACY</p><h1 id="settings-title">Settings</h1>
+                <p class="muted">Secrets are never displayed here or persisted in frontend settings.</p></div></div>
+              <div class="settings-grid">
+                <article class="overview-card"><h2><svg class="module-heading-icon accent-blue" aria-hidden="true"><use href="assets/module-icons.svg#icon-requirements"></use></svg>Jira connection</h2><p id="settings-jira-url">Not connected</p><p id="settings-account" class="muted">Credentials are not shown.</p><button id="settings-disconnect" class="button button-quiet" type="button">Disconnect</button></article>
+                <article class="overview-card"><h2><svg class="module-heading-icon accent-purple" aria-hidden="true"><use href="assets/module-icons.svg#icon-sparkles"></use></svg>GroqCloud model</h2><p id="settings-model">Not selected</p><p id="settings-config" class="muted">Configuration details appear after analysis.</p></article>
+                <article class="overview-card"><h2><svg class="module-heading-icon accent-teal" aria-hidden="true"><use href="assets/module-icons.svg#icon-chart"></use></svg>Session inference usage</h2><div id="usage-summary" class="usage-summary"></div>
+                  <label class="field threshold-field"><span>Optional session token warning threshold</span><input id="token-warning-threshold" type="number" min="1" step="1" placeholder="No threshold"></label>
+                  <p id="usage-warning" class="warning-copy" role="status"></p></article>
+                <article class="overview-card"><h2><svg class="module-heading-icon accent-green" aria-hidden="true"><use href="assets/module-icons.svg#icon-check"></use></svg>Privacy and review</h2><p>Jira access is read-only. Jira credentials remain in Chrome session storage and are not sent to GroqCloud. Analysis and planning data remain in this dashboard session.</p><p>Review AI-generated findings, scores and suggestions before acting. Token usage represents only reported usage from this dashboard session, not the GroqCloud account quota or remaining allowance.</p></article>
+                <article class="overview-card"><h2><svg class="module-heading-icon accent-indigo" aria-hidden="true"><use href="assets/module-icons.svg#icon-settings"></use></svg>Application</h2><p id="application-version"></p><p>Manifest V3 Chrome extension · local Express backend · no extra frontend services.</p></article>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="app-config.js"></script>
+    <script src="analysis-summary.js"></script>
+    <script src="workspace-utils.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>

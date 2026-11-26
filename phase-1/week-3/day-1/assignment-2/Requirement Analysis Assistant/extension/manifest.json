@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "RAA — Requirement Analysis Assistant",
+  "version": "1.0.0",
+  "description": "From requirements to test readiness.",
+  "permissions": ["storage"],
+  "host_permissions": ["http://127.0.0.1:3000/*"],
+  "icons": {
+    "16": "assets/raa-icon-16.png",
+    "32": "assets/raa-icon-32.png",
+    "48": "assets/raa-icon-48.png",
+    "128": "assets/raa-icon-128.png"
+  },
+  "action": {
+    "default_title": "RAA — Requirement Analysis Assistant",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/raa-icon-16.png",
+      "32": "assets/raa-icon-32.png"
+    }
+  }
+}
